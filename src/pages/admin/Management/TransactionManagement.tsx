@@ -2,16 +2,16 @@ import { FaTrash } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
-
 import {
   useDeleteOrderMutation,
   useOrderDetailsQuery,
   useUpdateOrderMutation,
 } from "../../../redux/api/orderAPI";
-import { RootState } from "../../../redux/store";
+import { server } from "../../../redux/store";
+import { UserReducerInitialState } from "../../../types/reducer-types";
 import { Order, OrderItem } from "../../../types/types";
-import { responseToast } from "../../../utils/features";
 import { Skeleton } from "../../../components/Loader";
+import { responseToast } from "../../../utils/features";
 
 const defaultData: Order = {
   shippingInfo: {
@@ -33,12 +33,14 @@ const defaultData: Order = {
 };
 
 const TransactionManagement = () => {
-  const { user } = useSelector((state: RootState) => state.userReducer);
+  const { user } = useSelector(
+    (state: { userReducer: UserReducerInitialState }) => state.userReducer
+  );
 
   const params = useParams();
   const navigate = useNavigate();
 
-  const { isLoading, data, isError } = useOrderDetailsQuery(params.id!);
+  const { data, isLoading, isError } = useOrderDetailsQuery(params.id!);
 
   const {
     shippingInfo: { address, city, state, country, pinCode },
@@ -81,18 +83,13 @@ const TransactionManagement = () => {
           <Skeleton />
         ) : (
           <>
-            <section
-              style={{
-                padding: "2rem",
-              }}
-            >
+            <section style={{ padding: "2rem" }}>
               <h2>Order Items</h2>
-
               {orderItems.map((i) => (
                 <ProductCard
                   key={i._id}
                   name={i.name}
-                  photo={i.photo}
+                  photo={`${server}/${i.photo}`}
                   productId={i.productId}
                   _id={i._id}
                   quantity={i.quantity}
@@ -107,14 +104,15 @@ const TransactionManagement = () => {
               </button>
               <h1>Order Info</h1>
               <h5>User Info</h5>
-              <p>Name: {name}</p>
+              <p>Name:{name}</p>
               <p>
-                Address:{" "}
-                {`${address}, ${city}, ${state}, ${country} ${pinCode}`}
+                Address:
+                {`${address}, ${city}, ${state}, ${country}, ${pinCode} `}
               </p>
+
               <h5>Amount Info</h5>
               <p>Subtotal: {subtotal}</p>
-              <p>Shipping Charges: {shippingCharges}</p>
+              <p>Shiping Charges: {shippingCharges}</p>
               <p>Tax: {tax}</p>
               <p>Discount: {discount}</p>
               <p>Total: {total}</p>
@@ -134,9 +132,7 @@ const TransactionManagement = () => {
                   {status}
                 </span>
               </p>
-              <button className="shipping-btn" onClick={updateHandler}>
-                Process Status
-              </button>
+              <button className="shipping-btn" onClick={updateHandler}>Process Status</button>
             </article>
           </>
         )}
@@ -151,14 +147,16 @@ const ProductCard = ({
   price,
   quantity,
   productId,
-}: OrderItem) => (
-  <div className="transaction-product-card">
-    <img src={photo} alt={name} />
-    <Link to={`/product/${productId}`}>{name}</Link>
-    <span>
-      ₹{price} X {quantity} = ₹{price * quantity}
-    </span>
-  </div>
-);
+}: OrderItem) => {
+  return (
+    <div className="transaction-product-card">
+      <img src={photo} alt={name} />
+      <Link to={`/product/${productId}`}>{name}</Link>
+      <span>
+      ₹{price} x {quantity} = ₹{price * quantity}
+      </span>
+    </div>
+  );
+};
 
 export default TransactionManagement;
