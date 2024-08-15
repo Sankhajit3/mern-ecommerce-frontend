@@ -7,7 +7,6 @@ import { Navigate } from "react-router-dom";
 import AdminSidebar from "../../components/admin/AdminSidebar";
 import { BarChart, DoughnutChart } from "../../components/admin/Charts";
 import Table from "../../components/admin/DashboardTable";
-
 import { useStatsQuery } from "../../redux/api/dashboardAPI";
 import { RootState } from "../../redux/store";
 import { getLastMonths } from "../../utils/features";
@@ -23,106 +22,111 @@ const Dashboard = () => {
 
   const { isLoading, data, isError } = useStatsQuery(user?._id!);
 
-  const stats = data?.stats!;
-
   if (isError) return <Navigate to={"/"} />;
 
+  const stats = data?.stats!;
+
   return (
-    <div className="admin-container">
+    <div className="adminContainer">
       <AdminSidebar />
       <main className="dashboard">
         {isLoading ? (
           <Skeleton length={20} />
         ) : (
-          <>
-            <div className="bar">
-              <BsSearch />
-              <input type="text" placeholder="Search for data, users, docs" />
-              <FaRegBell />
-              <img src={user?.photo || userImg} alt="User" />
-            </div>
-
-            <section className="widget-container">
-              <WidgetItem
-                percent={stats.changePercent.revenue}
-                amount={true}
-                value={stats.count.revenue}
-                heading="Revenue"
-                color="rgb(0, 115, 255)"
-              />
-              <WidgetItem
-                percent={stats.changePercent.user}
-                value={stats.count.user}
-                color="rgb(0 198 202)"
-                heading="Users"
-              />
-              <WidgetItem
-                percent={stats.changePercent.order}
-                value={stats.count.order}
-                color="rgb(255 196 0)"
-                heading="Transactions"
-              />
-
-              <WidgetItem
-                percent={stats.changePercent.product}
-                value={stats.count.product}
-                color="rgb(76 0 255)"
-                heading="Products"
-              />
-            </section>
-
-            <section className="graph-container">
-              <div className="revenue-chart">
-                <h2>Revenue & Transaction</h2>
-                <BarChart
-                  labels={months}
-                  data_1={stats.charts.revenue}
-                  data_2={stats.charts.order}
-                  title_1="Revenue"
-                  title_2="Transaction"
-                  bgColor_1="rgb(0, 115, 255)"
-                  bgColor_2="rgba(53, 162, 235, 0.8)"
+          stats && (
+            <>
+              <div className="bar">
+                <BsSearch />
+                <input
+                  type="text"
+                  placeholder="Search for data, users, docs"
                 />
+                <FaRegBell />
+                <img src={user?.photo || userImg} alt="User" />
               </div>
 
-              <div className="dashboard-categories">
-                <h2>Inventory</h2>
+              <section className="widgetContainer">
+                <WidgetItem
+                  percent={stats.changePercent.revenue}
+                  amount={true}
+                  value={stats.count.revenue}
+                  heading="Revenue"
+                  color="rgb(0, 115, 255)"
+                />
+                <WidgetItem
+                  percent={stats.changePercent.user}
+                  value={stats.count.user}
+                  color="rgb(0 198 202)"
+                  heading="Users"
+                />
+                <WidgetItem
+                  percent={stats.changePercent.order}
+                  value={stats.count.order}
+                  color="rgb(255 196 0)"
+                  heading="Transactions"
+                />
 
-                <div>
-                  {stats.categoryCount.map((i) => {
-                    const [heading, value] = Object.entries(i)[0];
-                    return (
-                      <CategoryItem
-                        key={heading}
-                        value={value}
-                        heading={heading}
-                        color={`hsl(${value * 4}, ${value}%, 50%)`}
-                      />
-                    );
-                  })}
+                <WidgetItem
+                  percent={stats.changePercent.product}
+                  value={stats.count.product}
+                  color="rgb(76 0 255)"
+                  heading="Products"
+                />
+              </section>
+
+              <section className="graphContainer">
+                <div className="revenue-chart">
+                  <h2>Revenue & Transaction</h2>
+                  <BarChart
+                    labels={months}
+                    data_1={stats.charts.revenue}
+                    data_2={stats.charts.order}
+                    title_1="Revenue"
+                    title_2="Transaction"
+                    bgColor_1="rgb(0, 115, 255)"
+                    bgColor_2="rgba(53, 162, 235, 0.8)"
+                  />
                 </div>
-              </div>
-            </section>
 
-            <section className="transaction-container">
-              <div className="gender-chart">
-                <h2>Gender Ratio</h2>
-                <DoughnutChart
-                  labels={["Female", "Male"]}
-                  data={[stats.userRatio.female, stats.userRatio.male]}
-                  backgroundColor={[
-                    "hsl(340, 82%, 56%)",
-                    "rgba(53, 162, 235, 0.8)",
-                  ]}
-                  cutout={90}
-                />
-                <p>
-                  <BiMaleFemale />
-                </p>
-              </div>
-              <Table data={stats.latestTransaction} />
-            </section>
-          </>
+                <div className="dashboard-categories">
+                  <h2>Inventory</h2>
+
+                  <div>
+                    {stats.categoryCount.map((i) => {
+                      const [heading, value] = Object.entries(i)[0];
+                      return (
+                        <CategoryItem
+                          key={heading}
+                          value={value}
+                          heading={heading}
+                          color={`hsl(${value * 4}, ${value}%, 50%)`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+
+              <section className="transaction-container">
+                <div className="gender-chart">
+                  <h2>Gender Ratio</h2>
+                  <DoughnutChart
+                    labels={["Female", "Male"]}
+                    data={[stats.userRatio.female, stats.userRatio.male]}
+                    backgroundColor={[
+                      "hsl(340, 82%, 56%)",
+                      "rgba(53, 162, 235, 0.8)",
+                    ]}
+                    cutout={90}
+                  />
+                  <p>
+                    <BiMaleFemale />
+                  </p>
+                </div>
+                <Table data={stats.latestTransaction} />
+              </section>
+            </>
+          )
         )}
       </main>
     </div>
@@ -145,7 +149,7 @@ const WidgetItem = ({
   amount = false,
 }: WidgetItemProps) => (
   <article className="widget">
-    <div className="widget-info">
+    <div className="widgetInfo">
       <p>{heading}</p>
       <h4>{amount ? `₹${value}` : value}</h4>
       {percent > 0 ? (
@@ -160,7 +164,7 @@ const WidgetItem = ({
     </div>
 
     <div
-      className="widget-circle"
+      className="widgetcircle"
       style={{
         background: `conic-gradient(
         ${color} ${(Math.abs(percent) / 100) * 360}deg,
