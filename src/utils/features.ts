@@ -1,5 +1,5 @@
-import { FetchBaseQueryError } from "@reduxjs/toolkit/query";
 import { MessageResponse } from "../types/api-types";
+import { FetchBaseQueryError } from "@reduxjs/toolkit/query/react";
 import { SerializedError } from "@reduxjs/toolkit";
 import { NavigateFunction } from "react-router-dom";
 import toast from "react-hot-toast";
@@ -8,10 +8,8 @@ import * as moment from "moment";
 type ResType =
   | {
       data: MessageResponse;
-      error?: undefined;
     }
   | {
-      data?: undefined;
       error: FetchBaseQueryError | SerializedError;
     };
 
@@ -21,7 +19,7 @@ export const responseToast = (
   url: string
 ) => {
   if ("data" in res) {
-    toast.success(res.data!.message);
+    toast.success(res.data.message);
     if (navigate) navigate(url);
   } else {
     const error = res.error as FetchBaseQueryError;
@@ -55,3 +53,5 @@ export const getLastMonths = () => {
     last6Months,
   };
 };
+
+
