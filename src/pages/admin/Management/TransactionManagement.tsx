@@ -2,18 +2,16 @@ import { FaTrash } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { Link, Navigate, useNavigate, useParams } from "react-router-dom";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
+
 import {
   useDeleteOrderMutation,
   useOrderDetailsQuery,
   useUpdateOrderMutation,
 } from "../../../redux/api/orderAPI";
-import { server } from "../../../redux/store";
-import { UserReducerInitialState } from "../../../types/reducer-types";
+import { RootState } from "../../../redux/store";
 import { Order, OrderItem } from "../../../types/types";
-import { Skeleton } from "../../../components/Loader";
 import { responseToast } from "../../../utils/features";
-
-const orderItems: any[] = [];
+import { Skeleton } from "../../../components/Loader";
 
 const defaultData: Order = {
   shippingInfo: {
@@ -35,14 +33,12 @@ const defaultData: Order = {
 };
 
 const TransactionManagement = () => {
-  const { user } = useSelector(
-    (state: { userReducer: UserReducerInitialState }) => state.userReducer
-  );
+  const { user } = useSelector((state: RootState) => state.userReducer);
 
   const params = useParams();
   const navigate = useNavigate();
 
-  const { data, isLoading, isError } = useOrderDetailsQuery(params.id!);
+  const { isLoading, data, isError } = useOrderDetailsQuery(params.id!);
 
   const {
     shippingInfo: { address, city, state, country, pinCode },
@@ -78,20 +74,25 @@ const TransactionManagement = () => {
   if (isError) return <Navigate to={"/404"} />;
 
   return (
-    <div className="adminContainer">
+    <div className="admin-container">
       <AdminSidebar />
       <main className="product-management">
         {isLoading ? (
           <Skeleton />
         ) : (
           <>
-            <section style={{ padding: "2rem" }}>
+            <section
+              style={{
+                padding: "2rem",
+              }}
+            >
               <h2>Order Items</h2>
+
               {orderItems.map((i) => (
                 <ProductCard
                   key={i._id}
                   name={i.name}
-                  photo={`${server}/${i.photo}`}
+                  photo={i.photo}
                   productId={i.productId}
                   _id={i._id}
                   quantity={i.quantity}
@@ -106,15 +107,14 @@ const TransactionManagement = () => {
               </button>
               <h1>Order Info</h1>
               <h5>User Info</h5>
-              <p>Name:{name}</p>
+              <p>Name: {name}</p>
               <p>
-                Address:
-                {`${address}, ${city}, ${state}, ${country}, ${pinCode} `}
+                Address:{" "}
+                {`${address}, ${city}, ${state}, ${country} ${pinCode}`}
               </p>
-
               <h5>Amount Info</h5>
               <p>Subtotal: {subtotal}</p>
-              <p>Shiping Charges: {shippingCharges}</p>
+              <p>Shipping Charges: {shippingCharges}</p>
               <p>Tax: {tax}</p>
               <p>Discount: {discount}</p>
               <p>Total: {total}</p>
@@ -134,7 +134,9 @@ const TransactionManagement = () => {
                   {status}
                 </span>
               </p>
-              <button className="shipping-btn" onClick={updateHandler}>Process Status</button>
+              <button className="shipping-btn" onClick={updateHandler}>
+                Process Status
+              </button>
             </article>
           </>
         )}
@@ -149,16 +151,14 @@ const ProductCard = ({
   price,
   quantity,
   productId,
-}: OrderItem) => {
-  return (
-    <div className="transaction-product-card">
-      <img src={photo} alt={name} />
-      <Link to={`/product/${productId}`}>{name}</Link>
-      <span>
-      ₹{price} x {quantity} = ₹{price * quantity}
-      </span>
-    </div>
-  );
-};
+}: OrderItem) => (
+  <div className="transaction-product-card">
+    <img src={photo} alt={name} />
+    <Link to={`/product/${productId}`}>{name}</Link>
+    <span>
+      ₹{price} X {quantity} = ₹{price * quantity}
+    </span>
+  </div>
+);
 
 export default TransactionManagement;

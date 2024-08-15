@@ -15,6 +15,7 @@
     "@stripe/stripe-js": "^4.1.0",
     "axios": "^1.7.2",
     "chart.js": "^4.4.3",
+    "ecommerce-frontend": "file:",
     "excuse": "^0.1.2",
     "firebase": "^10.12.2",
     "moment": "^2.30.1",
