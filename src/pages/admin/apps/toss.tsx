@@ -2,8 +2,6 @@ import { useState } from "react";
 import AdminSidebar from "../../../components/admin/AdminSidebar";
 
 
-
-
 const Toss = () => {
   const [angle, setAngle] = useState<number>(0);
 
